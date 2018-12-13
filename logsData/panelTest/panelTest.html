@@ -203,10 +203,13 @@ $(document).ready(function () {
 </div>
 <div id="r-script-" class="section level2">
 <h2>R Script 전체</h2>
-</div>
-<div id="section" class="section level2">
-<h2></h2>
-<pre class="r"><code>ui &lt;- pageWithSidebar(
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(flexdashboard)
+library(leaflet)
+df&lt;-read.csv('d:/logsdata/cctv_clean.csv',header = T)
+View(df)
+ui &lt;- pageWithSidebar(
   headerPanel(
     flowLayout(
       &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;
@@ -238,6 +241,67 @@ server &lt;- function(input, output){
     cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
   }, ignoreNULL = FALSE)
 
+  #df = data.frame(Lat = 1:10, Long = rnorm(10))
+  output$theMap &lt;- renderLeaflet({
+    leaflet(options = leafletOptions(
+        #maxZoom=12
+        # ,attributionControl = T
+        # ,zoomControl = F1
+      )) %&gt;%
+      addProviderTiles(providers$OpenStreetMap.Mapnik,
+        options = providerTileOptions(noWrap = TRUE)
+      ) %&gt;%
+      #addMarkers(data = cbind(127.38, 36.35))
+      #addMarkers(lng=127.38, lat=36.35)
+      addCircles(data=df, radius=10, lng=~LNG, lat=~LAT)
+  })
+}
+shinyApp(ui=ui, server=server)</code></pre>
+<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
+</div>
+<div id="setup" class="section level2">
+<h2>setup</h2>
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(flexdashboard)
+library(leaflet)</code></pre>
+</div>
+<div id="ui" class="section level2">
+<h2>UI</h2>
+<pre class="r"><code>ui &lt;- pageWithSidebar(
+  headerPanel(
+    flowLayout(
+      &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;
+    )
+  ),
+  
+  mainPanel(
+    &quot;main panel&quot;,
+    leafletOutput(&quot;theMap&quot;)
+  ),
+  # mainPanel(
+  # tabsetPanel(
+  #   tabPanel(&quot;Plot&quot;, plotOutput(&quot;plot&quot;)),
+  #   tabPanel(&quot;Summary&quot;, verbatimTextOutput(&quot;summary&quot;)),
+  #   tabPanel(&quot;Table&quot;, tableOutput(&quot;table&quot;))
+  # )
+
+  #sidebarPanel(
+    navlistPanel(
+      tabPanel(&quot;a&quot;,NULL),
+      tabPanel(&quot;a&quot;,NULL),
+      tabPanel(&quot;a&quot;,NULL)
+    )
+  #)
+)</code></pre>
+</div>
+<div id="server" class="section level2">
+<h2>SERVER</h2>
+<pre class="r"><code>server &lt;- function(input, output){
+  points &lt;- eventReactive(input$recalc, {
+    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+  }, ignoreNULL = FALSE)
+
   df = data.frame(Lat = 1:10, Long = rnorm(10))
   output$theMap &lt;- renderLeaflet({
     leaflet(options = leafletOptions(
@@ -245,15 +309,18 @@ server &lt;- function(input, output){
         # ,attributionControl = T
         # ,zoomControl = F1
       )) %&gt;%
-      addProviderTiles(providers$Stamen.TonerLite,
+      addProviderTiles(providers$OpenStreetMap.Mapnik,
         options = providerTileOptions(noWrap = TRUE)
       ) %&gt;%
       #addMarkers(data = cbind(127.38, 36.35))
       #addMarkers(lng=127.38, lat=36.35)
       addCircles(radius = 1000, lng=127.38, lat=36.35)
   })
-}
-shinyApp(ui=ui, server=server)</code></pre>
+}</code></pre>
+</div>
+<div id="r-shiny-" class="section level2">
+<h2>R Shiny 실행</h2>
+<pre class="r"><code>shinyApp(ui=ui, server=server)</code></pre>
 <div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
 </div>
 
