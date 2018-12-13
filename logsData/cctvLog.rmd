@@ -1,0 +1,34 @@
+---
+title: "note"
+output: html_document
+---
+
+```{r setup, include=F}
+library(stringr)
+setwd('d:/logsData')
+```
+
+##  data preparation
+source is drv_wonwoo_101.log  
+load it by 1 variable x n rows
+```{r prep1, include=T}
+cctv<-read.csv('drv_wonwoo_101.log',sep='#',header=FALSE)
+```
+
+## split string using regex  
+slipt pattern : str_match(source, pattern = '^([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +(.+)$')  
+
+```{r prep2}
+splitPtzLog <- function(data) { 
+    return (str_match(data, pattern = '^([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +(.+)$')[2:6]) 
+}
+cctv_split<-Map(splitPtzLog, cctv[[1]])
+cctv_clean<-t(data.frame(cctv_split))
+row.names(cctv_clean) = NULL
+colnames(cctv_clean)=c('date','type', 'source', 'line', 'log')
+```
+## Now have clean data , so save it
+
+```{r saveCleanData}
+write.csv(cctv_clean, file = 'ptz_clean.csv', header=TRUE);
+```

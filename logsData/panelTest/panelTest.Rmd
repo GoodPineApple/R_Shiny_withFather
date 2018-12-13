@@ -1,0 +1,80 @@
+---
+title: "panelTest"
+output: html_document
+---
+
+타이틀 영역
+-----------
+> title: "panelTest"
+  output: html_document
+
+현재는 html_document로 작성합니다.
+
+flexdashboard를 사용할 때 타이틀 영역
+-------------------------------------
+> title: "panelTest"
+output: 
+flexdashboard::flex_dashboard:
+storyboard: true
+social: menu
+source: embed
+
+## R Script 전체
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(flexdashboard)
+library(leaflet)
+```
+
+## 
+```{r panel}
+ui <- pageWithSidebar(
+  headerPanel(
+    flowLayout(
+      "1","2","3","4"
+    )
+  ),
+  
+  mainPanel(
+    "main panel",
+    leafletOutput("theMap")
+  ),
+  # mainPanel(
+  # tabsetPanel(
+  #   tabPanel("Plot", plotOutput("plot")),
+  #   tabPanel("Summary", verbatimTextOutput("summary")),
+  #   tabPanel("Table", tableOutput("table"))
+  # )
+
+  #sidebarPanel(
+    navlistPanel(
+      tabPanel("a",NULL),
+      tabPanel("a",NULL),
+      tabPanel("a",NULL)
+    )
+  #)
+)
+
+server <- function(input, output){
+  points <- eventReactive(input$recalc, {
+    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+  }, ignoreNULL = FALSE)
+
+  df = data.frame(Lat = 1:10, Long = rnorm(10))
+  output$theMap <- renderLeaflet({
+    leaflet(options = leafletOptions(
+        #maxZoom=12
+        # ,attributionControl = T
+        # ,zoomControl = F1
+      )) %>%
+      addProviderTiles(providers$OpenStreetMap.Mapnik,
+        options = providerTileOptions(noWrap = TRUE)
+      ) %>%
+      #addMarkers(data = cbind(127.38, 36.35))
+      #addMarkers(lng=127.38, lat=36.35)
+      addCircles(radius = 1000, lng=127.38, lat=36.35)
+  })
+}
+shinyApp(ui=ui, server=server)
+```

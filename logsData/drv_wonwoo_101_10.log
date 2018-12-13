@@ -1,0 +1,10 @@
+12-08T19:28:09.897768 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
+12-08T19:28:10.897874 TRC              driver_client.cpp  305 driver_client::send_keepalive()
+12-08T19:28:10.897973 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
+12-08T19:28:11.898070 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
+12-08T19:28:12.898201 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
+12-08T19:28:13.898329 TRC              driver_client.cpp  305 driver_client::send_keepalive()
+12-08T19:28:13.898421 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
+12-08T19:28:14.898513 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
+12-08T19:28:14.900287 TRC         process_queue_base.cpp  138 Process queue check_driver_client/processor_0, queue: 0, in: 4, out: 4
+12-08T19:28:15.898632 DBG              driver_client.cpp  334 ======Send Queue Count : 0/5000 =====
