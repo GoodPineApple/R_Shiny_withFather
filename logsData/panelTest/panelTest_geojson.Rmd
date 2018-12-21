@@ -96,6 +96,7 @@ shinyApp(ui=ui, server=server)
 ```{r shinyApp}
 library(leaflet)
 library(sp)
+library(geojsonio)
 options(encoding = "UTF-8")
 
 # mhSPDF <- geojsonio::geojson_read(url, what = "sp")
