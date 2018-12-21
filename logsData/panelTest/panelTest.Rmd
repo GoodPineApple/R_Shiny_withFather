@@ -27,7 +27,7 @@ library(shiny)
 library(flexdashboard)
 library(leaflet)
 df<-read.csv('cctv_clean.csv',header = T)
-View(df)
+# View(df)
 ui <- pageWithSidebar(
   headerPanel(
     flowLayout(
