@@ -26,17 +26,17 @@ knitr::opts_chunk$set(echo = TRUE)
 library(shiny)
 library(flexdashboard)
 library(leaflet)
-df<-read.csv('cctv_clean.csv',header = T)
+df<-read.csv('resources/cctv_clean.csv',header = T)
 # View(df)
 ui <- pageWithSidebar(
   headerPanel(
     flowLayout(
-      "1","2","3","4"
+      "1첫번째","두번째","세번째","네번째"
     )
   ),
   
   mainPanel(
-    "main panel",
+    "메인",
     leafletOutput("theMap")
   ),
   # mainPanel(
@@ -48,9 +48,9 @@ ui <- pageWithSidebar(
 
   #sidebarPanel(
     navlistPanel(
-      tabPanel("a",NULL),
-      tabPanel("a",NULL),
-      tabPanel("a",NULL)
+      tabPanel("일",NULL),
+      tabPanel("이",NULL),
+      tabPanel("삼",NULL)
     )
   #)
 )
