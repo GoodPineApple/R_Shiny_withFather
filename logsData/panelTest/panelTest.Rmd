@@ -26,7 +26,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(shiny)
 library(flexdashboard)
 library(leaflet)
-df<-read.csv('resources/cctv_clean.csv',header = T)
+#cctv<-read.csv('resources/cctv_clean.csv',header = T)
+tashu<-read.csv('resources/tashu_station.csv',header = T)
 # View(df)
 ui <- pageWithSidebar(
   headerPanel(
@@ -55,11 +56,30 @@ ui <- pageWithSidebar(
   #)
 )
 
+
+# server
+####################################
+# 변수선언
+resPath = "resources/"
+cctvDataNm = "cctv_clean.csv"
+tashuDataNm = "tashu_station.csv"
+
+# 기본타입색 1:CCTV 2:TASHU
+rootTypeColors <- c("1"="#595490", "2"="#527525")
+
+# CCTV 위치정보조회
+getLocationCCTV <- function(){
+  path <- paste0(resPath,cctvDataNm)
+  read.csv(path,header = T)
+}
+
 server <- function(input, output){
   points <- eventReactive(input$recalc, {
     cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
   }, ignoreNULL = FALSE)
-
+  
+  cctv <- getLocationCCTV()
+  
   #df = data.frame(Lat = 1:10, Long = rnorm(10))
   output$theMap <- renderLeaflet({
     leaflet(options = leafletOptions(
@@ -72,7 +92,9 @@ server <- function(input, output){
       ) %>%
       #addMarkers(data = cbind(127.38, 36.35))
       #addMarkers(lng=127.38, lat=36.35)
-      addCircles(data=df, radius=10, lng=~LNG, lat=~LAT)
+      addCircles(
+        data=cctv, radius=10, lng=~LNG, lat=~LAT
+      )
   })
 }
 shinyApp(ui=ui, server=server)
