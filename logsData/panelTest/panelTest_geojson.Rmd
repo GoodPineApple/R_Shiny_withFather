@@ -92,8 +92,46 @@ shinyApp(ui=ui, server=server)
 ```{r server}
 ```
 
-## R Shiny 실행
+## geojson 변형
 ```{r shinyApp}
+library(leaflet)
+library(sp)
+library(geojsonio)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+   
+  titlePanel(
+    leafletOutput("theMap", height = 1000)
+  )
+)
+
+
+server <- function(input, output){
+  points <- eventReactive(input$recalc, {
+    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+  }, ignoreNULL = FALSE)
+  
+  mhSPDF <- geojsonio::geojson_read("resources/TL_SCCO_EMD0.geojson", what = "sp")
+  
+  #df = data.frame(Lat = 1:10, Long = rnorm(10))
+  output$theMap <- renderLeaflet({
+    leaflet(options = leafletOptions(
+      maxZoom=14, minZoom=11, attributionControl = T
+    )) %>%
+      addProviderTiles(providers$OpenStreetMap.Mapnik,
+                       options = providerTileOptions(noWrap = TRUE)
+      ) %>%
+  setView(127.38, 36.35, 6) %>%
+  addPolygons(data = mhSPDF, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+  })
+}
+shinyApp(ui=ui, server=server)
+```
+
+
+## geojson 첫 적용
+``` {r shinyApp}
 library(leaflet)
 library(sp)
 library(geojsonio)
@@ -110,7 +148,33 @@ leaflet() %>% addProviderTiles(providers$Stamen.TonerLite) %>%
   addPolygons(data = mhSPDF, opacity = 5,
               # label = ~NAME_2, weight = 1,
               # fillColor = ~cols(NAME_2))
-              label = ~adm_cd, weight = 1,
+              label = ~adm_nm, weight = 1,
               fillColor = ~cols(adm_cd))
+```
 
+
+
+## geojson SH파일 읽기
+``` {r shinyApp}
+library(leaflet)
+library(sp)
+library(geojsonio)
+require(rgdal)
+options(encoding = "UTF-8")
+Sys.setlocale('LC_ALL','C') 
+
+mhSPDF <- readOGR("resources/EMD_201804/TL_SCCO_EMD.shp", 
+                                  layer = "TL_SCCO_EMD", 
+                                  GDAL1_integer64_policy = TRUE)
+
+mhSPDF <- spTransform(mhSPDF, CRS("+proj=longlat +datum=WGS84 +no_defs"))
+
+#cols <- colorFactor(topo.colors(nrow(mhSPDF)), mhSPDF$NAME_2)
+cols <- colorFactor(topo.colors(nrow(mhSPDF)), mhSPDF$adm_cd)
+
+leaflet() %>% addProviderTiles(providers$Stamen.TonerLite) %>%
+  setView(127.38, 36.35, 6) %>%
+  addPolygons(data = mhSPDF, opacity = 5, weight = 1
+              # fillColor = ~cols(NAME_2))
+              )
 ```

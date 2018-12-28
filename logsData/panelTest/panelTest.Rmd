@@ -25,34 +25,33 @@ R Script 전체
 knitr::opts_chunk$set(echo = TRUE)
 library(shiny)
 library(flexdashboard)
+library(shinydashboard)
 library(leaflet)
-#cctv<-read.csv('resources/cctv_clean.csv',header = T)
-tashu<-read.csv('resources/tashu_station.csv',header = T)
 # View(df)
-ui <- pageWithSidebar(
-  headerPanel(
-    flowLayout(
-      "1첫번째","두번째","세번째","네번째"
-    )
-  ),
+
+ui <- fluidPage(
+  # headerPanel(
+  #   flowLayout(
+  #     "CCTV, TASHU 위치"
+  #   )
+  # ),
   
   mainPanel(
-    "메인",
-    leafletOutput("theMap")
-  ),
+    leafletOutput("theMap", height = 1000)
+  )
   # mainPanel(
   # tabsetPanel(
   #   tabPanel("Plot", plotOutput("plot")),
   #   tabPanel("Summary", verbatimTextOutput("summary")),
   #   tabPanel("Table", tableOutput("table"))
   # )
-
+  
   #sidebarPanel(
-    navlistPanel(
-      tabPanel("일",NULL),
-      tabPanel("이",NULL),
-      tabPanel("삼",NULL)
-    )
+  #navlistPanel(
+  #  tabPanel("모두 조회",NULL),
+  #  tabPanel("CCTV 조회",NULL),
+  #  tabPanel("TASHU 조회",NULL)
+  #)
   #)
 )
 
@@ -65,11 +64,17 @@ cctvDataNm = "cctv_clean.csv"
 tashuDataNm = "tashu_station.csv"
 
 # 기본타입색 1:CCTV 2:TASHU
-rootTypeColors <- c("1"="#595490", "2"="#527525")
+rootTypeColors <- c("1"="navy", "2"="red")
 
 # CCTV 위치정보조회
 getLocationCCTV <- function(){
   path <- paste0(resPath,cctvDataNm)
+  read.csv(path,header = T)
+}
+
+# TASHU 위치정보조회
+getLocationTASHU <- function(){
+  path <- paste0(resPath,tashuDataNm)
   read.csv(path,header = T)
 }
 
@@ -79,21 +84,34 @@ server <- function(input, output){
   }, ignoreNULL = FALSE)
   
   cctv <- getLocationCCTV()
+  tashu <- getLocationTASHU()
   
   #df = data.frame(Lat = 1:10, Long = rnorm(10))
   output$theMap <- renderLeaflet({
     leaflet(options = leafletOptions(
-        #maxZoom=12
-        # ,attributionControl = T
-        # ,zoomControl = F1
+        maxZoom=14, minZoom=9, attributionControl = T
       )) %>%
       addProviderTiles(providers$OpenStreetMap.Mapnik,
         options = providerTileOptions(noWrap = TRUE)
       ) %>%
-      #addMarkers(data = cbind(127.38, 36.35))
-      #addMarkers(lng=127.38, lat=36.35)
+      addTiles(group = "OSM (default)", 
+                options = providerTileOptions(noWrap = TRUE)) %>%
+      addProviderTiles(providers$Stamen.Toner, group = "Toner", 
+                        options = providerTileOptions(noWrap = TRUE)) %>%
+      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite", 
+                        options = providerTileOptions(noWrap = TRUE)) %>%
       addCircles(
-        data=cctv, radius=10, lng=~LNG, lat=~LAT
+        data=cctv, radius=20, lng=~LNG, lat=~LAT, color='red',
+        fillOpacity=0.5, group="CCTV"
+      ) %>%
+      addCircles(
+        data=tashu, radius=20, lng=~LNG, lat=~LAT, color = 'navy',
+        fillOpacity=0.5, group="TASHU"
+      ) %>%
+      addLayersControl(
+        baseGroups = c("OSM (default)", "Toner", "Mapnik", "Toner Lite"),
+        overlayGroups = c("CCTV", "TASHU"),
+        options = layersControlOptions(collapsed = FALSE)
       )
   })
 }
